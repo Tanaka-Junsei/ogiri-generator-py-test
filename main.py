@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import firestore
 import os
+from datetime import datetime
 
 # Firestoreのクライアントを初期化
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service.json"
@@ -16,8 +17,14 @@ class Question(BaseModel):
     timestamp: str
 
 @app.post("/add-data")
-async def add_data(data: Question):
+async def add_data():
     try:
+        # Question型のデータを生成
+        data = Question(
+            question="Sample question",
+            questionId=123,
+            timestamp=datetime.utcnow().isoformat()
+        )
         # Firestoreのコレクションにデータを書き込む
         doc_ref = db.collection('question').document()
         doc_ref.set(data.dict())
